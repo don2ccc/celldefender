@@ -1,7 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safely retrieve API Key
+const GEMINI_API_KEY = process.env.API_KEY;
+
+// Initialize Google GenAI conditionally to prevent app crash on load if key is missing
+let ai: GoogleGenAI | null = null;
+if (GEMINI_API_KEY && GEMINI_API_KEY !== "undefined") {
+  try {
+    ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  } catch (error) {
+    console.warn("Failed to initialize Google GenAI SDK:", error);
+  }
+}
 
 export interface NarratorResponse {
   message: string;
@@ -9,20 +20,20 @@ export interface NarratorResponse {
 }
 
 // DeepSeek Configuration
-// Key is retrieved from environment variables to prevent exposure in source code
 const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_URL = "https://api.deepseek.com";
 
 // Initialize OpenAI client for DeepSeek
+// Use a placeholder if key is missing to prevent OpenAI SDK from throwing on init
 const deepseekClient = new OpenAI({
   baseURL: DEEPSEEK_URL,
-  apiKey: DEEPSEEK_KEY || "missing-key", // Use placeholder if missing to allow app load
-  dangerouslyAllowBrowser: true // Required for client-side usage
+  apiKey: DEEPSEEK_KEY || "missing-key", 
+  dangerouslyAllowBrowser: true 
 });
 
 async function callDeepSeek(prompt: string): Promise<string> {
-    if (!DEEPSEEK_KEY) {
-        throw new Error("DeepSeek API Key is missing. Please set DEEPSEEK_API_KEY in environment variables.");
+    if (!DEEPSEEK_KEY || DEEPSEEK_KEY === "undefined") {
+        throw new Error("DeepSeek API Key is missing.");
     }
 
     const completion = await deepseekClient.chat.completions.create({
@@ -68,21 +79,27 @@ export const generateNarratorText = async (
 
   let textResult = "";
 
-  // 1. Try Gemini
-  try {
-    const response = await ai.models.generateContent({
-        model: model,
-        contents: prompt,
-    });
-    textResult = response.text?.trim() || "";
-  } catch (error) {
-    console.warn("Gemini API failed, attempting DeepSeek fallback...", error);
-    
-    // 2. Fallback to DeepSeek
+  // 1. Try Gemini (Only if initialized)
+  if (ai) {
+    try {
+        const response = await ai.models.generateContent({
+            model: model,
+            contents: prompt,
+        });
+        textResult = response.text?.trim() || "";
+    } catch (error) {
+        console.warn("Gemini API failed, attempting DeepSeek fallback...", error);
+    }
+  } else {
+      console.warn("Gemini API Key missing, skipping Gemini.");
+  }
+
+  // 2. Fallback to DeepSeek if Gemini failed or was skipped
+  if (!textResult) {
     try {
         textResult = await callDeepSeek(prompt);
     } catch (dsError) {
-        console.error("DeepSeek API failed", dsError);
+        console.error("DeepSeek API failed or missing", dsError);
         // 3. Fallback to Offline/Default
         textResult = "连接大脑指令失败... 请小心行事！";
     }
