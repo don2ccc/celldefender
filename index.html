@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Cell Defenders: Craft Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+      
+      body {
+        font-family: 'VT323', monospace; /* Pixel font */
+        overflow: hidden;
+        background-color: #1a1a2e;
+        color: white;
+        image-rendering: pixelated; /* Crisp edges */
+        touch-action: none; /* Prevent browser gestures */
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 12px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #2d2d42;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #7f7f7f;
+        border: 2px solid #333;
+      }
+
+      /* Minecraft Button Style Class */
+      .mc-button {
+        background-color: #7f7f7f;
+        border: 2px solid #000;
+        border-top-color: #ddd;
+        border-left-color: #ddd;
+        border-bottom-color: #555;
+        border-right-color: #555;
+        color: white;
+        text-shadow: 2px 2px #000;
+        cursor: pointer;
+        user-select: none;
+      }
+      .mc-button:active {
+        border-top-color: #555;
+        border-left-color: #555;
+        border-bottom-color: #ddd;
+        border-right-color: #ddd;
+        background-color: #666;
+      }
+      
+      .mc-panel {
+        background-color: #c6c6c6;
+        border: 4px solid #000;
+        box-shadow: inset -4px -4px #555, inset 4px 4px #fff;
+        color: #333;
+      }
+
+      .text-shadow-mc {
+        text-shadow: 2px 2px 0px #000;
+      }
+
+      /* Touch Control Styles */
+      .dpad-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(4px);
+      }
+      .dpad-btn:active {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "openai": "https://esm.sh/openai@4.52.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
