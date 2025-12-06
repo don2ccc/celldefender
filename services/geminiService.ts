@@ -1,11 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 
-// Safe initialization
-let ai: GoogleGenAI | null = null;
-if (process.env.API_KEY) {
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-}
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export interface NarratorResponse {
   message: string;
@@ -74,15 +70,11 @@ export const generateNarratorText = async (
 
   // 1. Try Gemini
   try {
-    if (ai) {
-        const response = await ai.models.generateContent({
-            model: model,
-            contents: prompt,
-        });
-        textResult = response.text?.trim() || "";
-    } else {
-        throw new Error("Gemini API Key missing or client not initialized");
-    }
+    const response = await ai.models.generateContent({
+        model: model,
+        contents: prompt,
+    });
+    textResult = response.text?.trim() || "";
   } catch (error) {
     console.warn("Gemini API failed, attempting DeepSeek fallback...", error);
     
